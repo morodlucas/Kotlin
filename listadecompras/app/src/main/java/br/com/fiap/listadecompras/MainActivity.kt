@@ -16,8 +16,11 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import android.widget.Button
 import android.widget.EditText
+import androidx.activity.viewModels
 
 class MainActivity : AppCompatActivity() {
+
+    val viewModel: ItemsViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,15 +43,16 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val item = ItemModel(
-                name = editText.text.toString(),
-                onRemove = {
-                    itemsAdapter.removeItem(it)
-                }
-            )
-
-            itemsAdapter.addItem(item)
+            viewModel.addItem(editText.text.toString())
             editText.text.clear()
+        }
+
+        /**
+         * Observa as alterações na lista de itens na ViewModel.
+         * Quando a lista de itens é alterada, atualiza o ItemsAdapter com a nova lista.
+         */
+        viewModel.itemsLiveData.observe(this) {
+                items -> itemsAdapter.updateItems(items)
         }
 
     }
